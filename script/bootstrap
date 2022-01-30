@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+if [[ ! -x "$(which go)" ]]; then
+    echo >&2 "an installation of Go is required to build"
+    exit 1
+fi
+
+echo Installing Go tools...
+make tools
+
+echo Compiling apps...
+make
