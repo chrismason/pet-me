@@ -40,6 +40,7 @@ func Load() (*ServerConfig, error) {
 	cfg.CatPicsAPI = os.Getenv("CAT_PICS_ENDPOINT")
 	cfg.CatPicsAPIKey = os.Getenv("CAT_PICS_API_KEY")
 	cfg.DogPicsAPI = os.Getenv("DOG_PICS_ENDPOINT")
+	cfg.InstrumentationKey = os.Getenv("INSTRUMENTATION_KEY")
 
 	return cfg, nil
 }

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/chrismason/pet-me/internal/config"
+	"github.com/chrismason/pet-me/internal/log"
 	"github.com/chrismason/pet-me/internal/models"
 )
 
@@ -78,7 +79,8 @@ func TestFactsHandler(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := config.ServerConfig{}
+			cfg := &config.ServerConfig{}
+			log := log.NewLogger(log.DisableLogging, cfg)
 			if tc.server != nil {
 				cfg.FactsAPI = tc.server.URL
 				defer tc.server.Close()
@@ -89,7 +91,7 @@ func TestFactsHandler(t *testing.T) {
 			}
 
 			rec := httptest.NewRecorder()
-			status, err := getCatFactsInner(&cfg, rec, req)
+			status, err := getCatFactsInner(cfg, log, rec, req)
 
 			res := rec.Result()
 			defer res.Body.Close()

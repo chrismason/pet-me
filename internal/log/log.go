@@ -1,6 +1,10 @@
 package log
 
 import (
+	"fmt"
+	"log"
+	"time"
+
 	"github.com/chrismason/pet-me/internal/config"
 
 	"github.com/microsoft/ApplicationInsights-Go/appinsights"
@@ -21,8 +25,8 @@ type Logger struct {
 	client appinsights.TelemetryClient
 }
 
-func New(lvl Level, cfg *config.ServerConfig) *Logger {
-	client := appinsights.NewTelemetryClient("")
+func NewLogger(lvl Level, cfg *config.ServerConfig) *Logger {
+	client := appinsights.NewTelemetryClient(cfg.InstrumentationKey)
 
 	if lvl == DisableLogging || cfg.InstrumentationKey == "" {
 		client.SetIsEnabled(false)
@@ -34,7 +38,7 @@ func New(lvl Level, cfg *config.ServerConfig) *Logger {
 	}
 }
 
-func (l *Logger) log(lvl Level, msg string) {
+func (l *Logger) appInsightsLog(lvl Level, msg string) {
 	if l.Level > lvl {
 		return
 	}
@@ -52,14 +56,50 @@ func (l *Logger) log(lvl Level, msg string) {
 	l.client.TrackTrace(msg, sev)
 }
 
+func (l *Logger) logLog(lvl Level, msg string) {
+	if l.Level > lvl {
+		return
+	}
+
+	log.Println(msg)
+}
+
 func (l *Logger) Debug(msg string) {
-	l.log(DebugLevel, msg)
+	if l.client.IsEnabled() {
+		l.appInsightsLog(DebugLevel, msg)
+	} else {
+		l.logLog(DebugLevel, msg)
+	}
 }
 
 func (l *Logger) Info(msg string) {
-	l.log(InfoLevel, msg)
+	if l.client.IsEnabled() {
+		l.appInsightsLog(InfoLevel, msg)
+	} else {
+		l.logLog(InfoLevel, msg)
+	}
 }
 
 func (l *Logger) Error(msg string) {
-	l.log(ErrorLevel, msg)
+	if l.client.IsEnabled() {
+		l.appInsightsLog(ErrorLevel, msg)
+	} else {
+		l.logLog(ErrorLevel, msg)
+	}
+}
+
+func (l *Logger) Request(method string, url string, duration time.Duration, statusCode string) {
+	if l.client.IsEnabled() {
+		l.client.TrackRequest(method, url, duration, statusCode)
+	} else {
+		l.logLog(InfoLevel, fmt.Sprintf("Method '%s' at '%s' took '%v' with status code '%s'", method, url, duration, statusCode))
+	}
+}
+
+func (l *Logger) Dependency(name string, target string, success bool) {
+	if l.client.IsEnabled() {
+		l.client.TrackRemoteDependency(name, "HTTP", target, success)
+	} else {
+		l.logLog(InfoLevel, fmt.Sprintf("Calling HTTP endpoint '%s' with target '%s' with a success status of %t", name, target, success))
+	}
 }

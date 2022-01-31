@@ -42,6 +42,8 @@ func newCatPicsCommand() *cobra.Command {
 		RunE:  picCommand.Run,
 	}
 
+	picCommand.registerFlags(cmd)
+
 	return cmd
 }
 

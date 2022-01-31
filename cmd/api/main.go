@@ -2,16 +2,16 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/chrismason/pet-me/internal/config"
+	"github.com/chrismason/pet-me/internal/log"
 	"github.com/chrismason/pet-me/internal/rest"
 	"github.com/chrismason/pet-me/internal/server"
 )
 
 func main() {
 	if err := realMain(); err != nil {
-		log.Fatalf("failed to run service: %v", err)
+		panic(fmt.Sprintf("failed to run service: %v", err))
 	}
 }
 
@@ -21,7 +21,9 @@ func realMain() error {
 		return err
 	}
 
-	handler := rest.Routes(cfg)
+	logger := log.NewLogger(log.InfoLevel, cfg)
+
+	handler := rest.Routes(cfg, logger)
 	server := server.NewHTTPServer(cfg, handler, fmt.Sprintf(":%v", cfg.HTTPPort))
 
 	return server.Run()

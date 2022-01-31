@@ -8,6 +8,7 @@ import (
 
 	"github.com/chrismason/pet-me/internal/config"
 	h "github.com/chrismason/pet-me/internal/http"
+	"github.com/chrismason/pet-me/internal/log"
 	"github.com/chrismason/pet-me/internal/models"
 )
 
@@ -16,11 +17,11 @@ const (
 	factsEndpoint = "facts?limit=%d"
 )
 
-func getCatFacts(cfg *config.ServerConfig) http.Handler {
-	return appHandler{cfg, getCatFactsInner}
+func getCatFacts(cfg *config.ServerConfig, log *log.Logger) http.Handler {
+	return appHandler{cfg, log, getCatFactsInner}
 }
 
-func getCatFactsInner(cfg *config.ServerConfig, w http.ResponseWriter, r *http.Request) (int, error) {
+func getCatFactsInner(cfg *config.ServerConfig, log *log.Logger, w http.ResponseWriter, r *http.Request) (int, error) {
 	q := r.URL.Query()
 	var count int
 
@@ -45,15 +46,17 @@ func getCatFactsInner(cfg *config.ServerConfig, w http.ResponseWriter, r *http.R
 	}
 
 	endpoint := fmt.Sprintf("%s/%s", cfg.FactsAPI, url)
-	fmt.Printf("Calling facts endpoint %s\n", endpoint)
+	log.Info(fmt.Sprintf("Calling facts endpoint %s", endpoint))
 
 	factsResp := models.FactResponse{}
 	if count > 1 {
 		facts := models.Facts{}
 		err := h.HttpGet(endpoint, &facts)
 		if err != nil {
+			log.Dependency("cat-facts", endpoint, false)
 			return http.StatusInternalServerError, fmt.Errorf("failed calling fact API")
 		}
+		log.Dependency("cat-facts", endpoint, true)
 		for _, item := range facts.Data {
 			factsResp.Facts = append(factsResp.Facts, item.Fact)
 		}
@@ -61,8 +64,10 @@ func getCatFactsInner(cfg *config.ServerConfig, w http.ResponseWriter, r *http.R
 		fact := models.FactDetails{}
 		err := h.HttpGet(endpoint, &fact)
 		if err != nil {
+			log.Dependency("cat-facts", endpoint, false)
 			return http.StatusInternalServerError, fmt.Errorf("failed calling fact API")
 		}
+		log.Dependency("cat-facts", endpoint, true)
 		factsResp.Facts = append(factsResp.Facts, fact.Fact)
 	}
 
