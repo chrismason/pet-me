@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -89,6 +91,14 @@ func (pc *getPicCommand) Run(cmd *cobra.Command, _ []string) error {
 	}
 
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return errors.New(string(b))
+	}
 
 	pic := models.Pic{}
 	err = json.NewDecoder(resp.Body).Decode(&pic)

@@ -14,9 +14,9 @@ var envConfigMap = map[string]EnvConfig{
 		BaseUrl:       "http://localhost:8080",
 		IsDevelopment: true,
 	},
-	"staging": {
-		Name:    "staging",
-		BaseUrl: "https://pet-me-staging.azurewebsites.net",
+	"integration": {
+		Name:    "integration",
+		BaseUrl: "https://pet-me-integration.azurewebsites.net",
 	},
 	"production": {
 		Name:    "production",
