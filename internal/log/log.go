@@ -14,10 +14,10 @@ import (
 type Level int
 
 const (
-	DebugLevel Level = 0
-	InfoLevel
-	ErrorLevel
-	DisableLogging
+	DebugLevel     Level = 0
+	InfoLevel      Level = 1
+	ErrorLevel     Level = 2
+	DisableLogging Level = 3
 )
 
 type Logger struct {
