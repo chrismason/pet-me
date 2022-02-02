@@ -42,7 +42,7 @@ jobs:
           ${{ env.CONTAINER_REGISTRY }}/pet-me-api:${{ github.sha }}
 
   deploy-integration:
-    needs: build-conainer
+    needs: build-container
     runs-on: ubuntu-latest
     environment: integration
     steps:
