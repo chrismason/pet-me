@@ -91,4 +91,3 @@ jobs:
       with:
         app-name: pet-me
         images: ${{ env.CONTAINER_REGISTRY }}/pet-me-api:${{ github.sha }}
-t
