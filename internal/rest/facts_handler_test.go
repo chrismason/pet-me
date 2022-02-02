@@ -28,6 +28,18 @@ func TestFactsHandler(t *testing.T) {
 			expectedError: "invalid parameter of 'factCount'",
 		},
 		{
+			name:          "paramter count is too high",
+			count:         "20",
+			status:        http.StatusBadRequest,
+			expectedError: "'factCount' is out of range of 1 - 10",
+		},
+		{
+			name:          "paramter count is too low",
+			count:         "-1",
+			status:        http.StatusBadRequest,
+			expectedError: "'factCount' is out of range of 1 - 10",
+		},
+		{
 			name:          "single fact",
 			count:         "1",
 			status:        http.StatusOK,

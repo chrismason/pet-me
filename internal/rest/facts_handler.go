@@ -34,6 +34,9 @@ func getCatFactsInner(cfg *config.ServerConfig, log *log.Logger, w http.Response
 			e := fmt.Errorf("invalid parameter of 'factCount'")
 			return http.StatusBadRequest, e
 		}
+		if count < 1 || count > 10 {
+			return http.StatusBadRequest, fmt.Errorf("'factCount' is out of range of 1 - 10")
+		}
 	} else {
 		count = 1
 	}
