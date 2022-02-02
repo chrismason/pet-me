@@ -18,7 +18,7 @@ jobs:
         with:
           go-version: "^1.17.6"
       - name: Install tools
-        run: make tool
+        run: make tools
       - name: Lint code
         run: make lint
       - name: Run tests
